@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FLYFiT – ADMIN PANEL</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root { --lime:#AAED3F; --lime-dark:#8FCC2A; --black:#080808; --card:#141414; --card2:#1c1c1c; --text:#F0F0F0; --muted:#666; --border:rgba(170,237,63,0.15); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--black); color:var(--text); font-family:'Noto Sans JP',sans-serif; font-weight:300; min-height:100vh; }
+
+  .login-wrap { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; padding:24px; }
+  .admin-logo { font-family:'Bebas Neue',sans-serif; font-size:3rem; color:var(--lime); text-shadow:0 0 30px rgba(170,237,63,.4); letter-spacing:.1em; margin-bottom:4px; }
+  .admin-sub { font-size:.7rem; color:var(--muted); letter-spacing:.3em; text-transform:uppercase; margin-bottom:40px; }
+  .login-box { width:100%; max-width:400px; background:var(--card); border:1px solid var(--border); border-radius:20px; padding:32px; }
+  .field { margin-bottom:16px; }
+  .field label { display:block; font-size:.7rem; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; margin-bottom:6px; }
+  .field input { width:100%; background:#0a0a0a; border:1px solid var(--border); border-radius:10px; padding:13px 16px; color:var(--text); font-size:.9rem; font-family:'Noto Sans JP',sans-serif; outline:none; }
+  .field input::placeholder { color:var(--muted); }
+  .btn-primary { width:100%; background:var(--lime); color:#000; border:none; border-radius:12px; padding:14px; font-size:.95rem; font-weight:700; font-family:'Noto Sans JP',sans-serif; cursor:pointer; margin-top:4px; }
+  .btn-primary:disabled { opacity:.5; }
+  .err { background:rgba(255,80,80,.1); border:1px solid rgba(255,80,80,.3); border-radius:8px; padding:10px 14px; font-size:.78rem; color:#ff8080; margin-bottom:12px; display:none; }
+  .status-msg { text-align:center; font-size:.75rem; color:var(--lime); margin-top:10px; display:none; }
+
+  .admin-wrap { display:none; max-width:800px; margin:0 auto; padding:32px 24px 60px; }
+  .admin-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:32px; }
+  .admin-title { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:.05em; }
+  .admin-title span { color:var(--lime); }
+  .btn-logout { background:none; border:1px solid var(--border); border-radius:8px; padding:8px 16px; color:var(--muted); font-size:.78rem; font-family:'Noto Sans JP',sans-serif; cursor:pointer; }
+
+  .post-card { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:28px; margin-bottom:28px; }
+  .post-card h2 { font-size:.8rem; letter-spacing:.15em; color:var(--lime); text-transform:uppercase; margin-bottom:20px; }
+  .form-row { display:grid; grid-template-columns:160px 1fr; gap:14px; margin-bottom:14px; }
+  .form-field { display:flex; flex-direction:column; gap:6px; }
+  .form-field label { font-size:.68rem; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; }
+  .form-field input, .form-field select, .form-field textarea { background:#0a0a0a; border:1px solid var(--border); border-radius:10px; padding:12px 14px; color:var(--text); font-size:.88rem; font-family:'Noto Sans JP',sans-serif; outline:none; }
+  .form-field textarea { resize:vertical; min-height:120px; line-height:1.7; }
+  .form-field select option { background:#0a0a0a; }
+  .notif-toggle { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .notif-toggle input[type=checkbox] { width:18px; height:18px; accent-color:var(--lime); cursor:pointer; }
+  .notif-toggle label { font-size:.82rem; color:var(--text); cursor:pointer; }
+  .post-actions { display:flex; justify-content:flex-end; gap:12px; align-items:center; margin-top:4px; }
+  .btn-post { background:var(--lime); color:#000; border:none; border-radius:12px; padding:13px 32px; font-size:.9rem; font-weight:700; font-family:'Noto Sans JP',sans-serif; cursor:pointer; }
+  .btn-post:disabled { opacity:.5; }
+  .post-success { font-size:.82rem; color:var(--lime); display:none; }
+
+  .list-card { background:var(--card); border:1px solid var(--border); border-radius:18px; padding:28px; }
+  .list-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+  .list-header h2 { font-size:.8rem; letter-spacing:.15em; color:var(--lime); text-transform:uppercase; }
+  .news-count { font-size:.72rem; color:var(--muted); }
+  .admin-news-item { background:var(--card2); border:1px solid rgba(170,237,63,.08); border-radius:14px; padding:18px; margin-bottom:12px; display:flex; align-items:flex-start; gap:16px; }
+  .ani-left { flex:1; min-width:0; }
+  .ani-tag { font-size:.6rem; color:var(--lime); letter-spacing:.12em; text-transform:uppercase; margin-bottom:5px; }
+  .ani-title { font-size:.92rem; font-weight:700; line-height:1.4; margin-bottom:4px; }
+  .ani-date { font-size:.68rem; color:var(--muted); margin-bottom:8px; }
+  .ani-body { font-size:.78rem; color:var(--muted); line-height:1.6; white-space:pre-wrap; }
+  .btn-delete { background:none; border:1px solid rgba(255,80,80,.25); border-radius:8px; padding:7px 14px; color:#ff6b6b; font-size:.72rem; font-family:'Noto Sans JP',sans-serif; cursor:pointer; white-space:nowrap; flex-shrink:0; }
+  .empty-state { text-align:center; padding:40px; color:var(--muted); font-size:.85rem; }
+  @media (max-width:600px) { .form-row { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<div class="login-wrap" id="login-wrap">
+  <div class="admin-logo">FLYFiT</div>
+  <div class="admin-sub">Admin Panel</div>
+  <div class="login-box">
+    <div class="err" id="admin-err"></div>
+    <div class="field"><label>メールアドレス</label><input type="email" id="admin-email" placeholder="your@email.com"></div>
+    <div class="field"><label>パスワード</label><input type="password" id="admin-pass" placeholder="••••••••"></div>
+    <button class="btn-primary" id="admin-login-btn" onclick="adminLogin()">管理者ログイン</button>
+    <div class="status-msg" id="login-status">ログイン中...</div>
+  </div>
+</div>
+
+<div class="admin-wrap" id="admin-wrap">
+  <div class="admin-header">
+    <div class="admin-title">管理<span>画面</span></div>
+    <button class="btn-logout" onclick="adminLogout()">ログアウト</button>
+  </div>
+  <div class="post-card">
+    <h2>📢 お知らせを投稿</h2>
+    <div class="form-row">
+      <div class="form-field">
+        <label>タグ</label>
+        <select id="post-tag">
+          <option value="お知らせ">お知らせ</option>
+          <option value="重要">重要</option>
+          <option value="イベント">イベント</option>
+          <option value="新着">新着</option>
+          <option value="キャンペーン">キャンペーン</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>タイトル</label>
+        <input type="text" id="post-title" placeholder="お知らせのタイトル">
+      </div>
+    </div>
+    <div class="form-field" style="margin-bottom:16px">
+      <label>本文</label>
+      <textarea id="post-body" placeholder="内容を入力..."></textarea>
+    </div>
+    <div class="notif-toggle">
+      <input type="checkbox" id="send-notif" checked>
+      <label for="send-notif">🔔 プッシュ通知も送る（アプリ会員全員）</label>
+    </div>
+    <div class="post-actions">
+      <span class="post-success" id="post-success">✅ 投稿しました！</span>
+      <button class="btn-post" id="post-btn" onclick="postNews()">投稿する</button>
+    </div>
+  </div>
+  <div class="list-card">
+    <div class="list-header">
+      <h2>投稿済みのお知らせ</h2>
+      <span class="news-count" id="news-count"></span>
+    </div>
+    <div id="admin-news-list"><div class="empty-state">読み込み中...</div></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyDC1sYaLfwWt8KyMnacZI6PN_m13bNUm78",
+    authDomain: "flyfit-5a273.firebaseapp.com",
+    projectId: "flyfit-5a273",
+    storageBucket: "flyfit-5a273.firebasestorage.app",
+    messagingSenderId: "917291626568",
+    appId: "1:917291626568:web:a4d040141f594c01fb287d"
+  });
+
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  let unsubNews = null;
+
+  auth.onAuthStateChanged(function(user) {
+    if (user) {
+      document.getElementById('login-wrap').style.display = 'none';
+      document.getElementById('admin-wrap').style.display = 'block';
+      startListener();
+    } else {
+      document.getElementById('login-wrap').style.display = 'flex';
+      document.getElementById('admin-wrap').style.display = 'none';
+      if (unsubNews) { unsubNews(); unsubNews = null; }
+    }
+  });
+
+  function startListener() {
+    unsubNews = db.collection('news').orderBy('createdAt','desc').onSnapshot(function(snap) {
+      var items = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+      renderAdminNews(items);
+    }, function(err) {
+      document.getElementById('admin-news-list').innerHTML = '<div class="empty-state">エラー: ' + err.message + '</div>';
+    });
+  }
+
+  function renderAdminNews(items) {
+    document.getElementById('news-count').textContent = items.length + '件';
+    var el = document.getElementById('admin-news-list');
+    if (!items.length) { el.innerHTML = '<div class="empty-state">まだ投稿はありません</div>'; return; }
+    el.innerHTML = items.map(function(item) {
+      var date = item.createdAt ? item.createdAt.toDate().toLocaleString('ja-JP') : '';
+      return '<div class="admin-news-item"><div class="ani-left"><div class="ani-tag">'+(item.tag||'')+'</div><div class="ani-title">'+(item.title||'')+'</div><div class="ani-date">'+date+'</div><div class="ani-body">'+(item.body||'')+'</div></div><button class="btn-delete" onclick="deleteNews(\''+item.id+'\')">削除</button></div>';
+    }).join('');
+  }
+
+  function adminLogin() {
+    var email = document.getElementById('admin-email').value.trim();
+    var pass = document.getElementById('admin-pass').value;
+    var errEl = document.getElementById('admin-err');
+    var btn = document.getElementById('admin-login-btn');
+    var statusEl = document.getElementById('login-status');
+    if (!email || !pass) { errEl.textContent='メールアドレスとパスワードを入力してください'; errEl.style.display='block'; return; }
+    errEl.style.display='none'; btn.disabled=true; statusEl.style.display='block';
+    auth.signInWithEmailAndPassword(email, pass).catch(function(e) {
+      var msg = 'ログインエラー: ' + e.code;
+      if (e.code==='auth/wrong-password'||e.code==='auth/user-not-found'||e.code==='auth/invalid-credential') msg='メールアドレスまたはパスワードが違います';
+      else if (e.code==='auth/invalid-email') msg='メールアドレスの形式が正しくありません';
+      else if (e.code==='auth/too-many-requests') msg='試行回数が多すぎます。しばらく後にお試しください';
+      errEl.textContent=msg; errEl.style.display='block'; btn.disabled=false; statusEl.style.display='none';
+    });
+  }
+
+  function adminLogout() { auth.signOut(); }
+
+  async function postNews() {
+    var tag = document.getElementById('post-tag').value;
+    var title = document.getElementById('post-title').value.trim();
+    var body = document.getElementById('post-body').value.trim();
+    var sendNotif = document.getElementById('send-notif').checked;
+    if (!title || !body) { alert('タイトルと本文を入力してください'); return; }
+
+    var btn = document.getElementById('post-btn');
+    btn.disabled = true; btn.textContent = '投稿中...';
+
+    try {
+      // Firestoreに投稿
+      await db.collection('news').add({
+        tag: tag, title: title, body: body,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      // プッシュ通知を送る
+      if (sendNotif) {
+        btn.textContent = '通知送信中...';
+        var snap = await db.collection('fcmTokens').get();
+        var subscriptions = snap.docs.map(function(d){ return d.data().token; }).filter(Boolean);
+        if (subscriptions.length > 0) {
+          await fetch('/.netlify/functions/send-notification', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ subscriptions: subscriptions, title: title, body: body })
+          });
+        }
+      }
+
+      document.getElementById('post-title').value = '';
+      document.getElementById('post-body').value = '';
+      var s = document.getElementById('post-success');
+      s.style.display = 'inline';
+      setTimeout(function(){ s.style.display='none'; }, 3000);
+    } catch(e) {
+      alert('エラー: ' + e.message);
+    } finally {
+      btn.disabled = false; btn.textContent = '投稿する';
+    }
+  }
+
+  function deleteNews(id) {
+    if (!confirm('このお知らせを削除しますか？')) return;
+    db.collection('news').doc(id).delete().catch(function(e){ alert('削除エラー: ' + e.message); });
+  }
+
+  document.getElementById('admin-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') adminLogin(); });
+</script>
+</body>
+</html>
